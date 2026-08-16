@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitación Camila y Liam</title>
+    <!-- Google Fonts para tipografía elegante y de fiesta -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS para utilidades de diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #ff9a9e;
+            --secondary-color: #a18cd1;
+            --text-dark: #4a4a4a;
+            --text-light: #ffffff;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(-45deg, #fbc2eb, #a6c1ee, #ff9a9e, #f6d365);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto; /* Permitir scroll si es necesario en móviles pequeños */
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card-wrapper {
+            animation: slideUpFade 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(50px);
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+        }
+
+        @keyframes slideUpFade {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 700px; /* Un poco más de altura */
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease;
+            transform-style: preserve-3d;
+            border-radius: 24px; /* Bordes más suaves */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 20px rgba(255,154,158,0.2);
+        }
+
+        /* Efecto hover luminoso en desktop */
+        @media (hover: hover) {
+            .card:hover {
+                box-shadow: 0 25px 50px rgba(0,0,0,0.2), 0 0 40px rgba(255,154,158,0.5);
+                transform: translateY(-5px);
+            }
+            .card.is-flipped:hover {
+                transform: rotateY(180deg) translateY(-5px);
+            }
+        }
+
+        /* Clase que se activa con JS para girar la tarjeta */
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Caras frontal y trasera */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            border-radius: 24px;
+            overflow: hidden;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-front {
+            /* Patrón sutil de fondo para el frente */
+            background-color: #ffffff;
+            background-image: radial-gradient(#ff9a9e 0.5px, transparent 0.5px), radial-gradient(#ff9a9e 0.5px, #ffffff 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            position: relative;
+        }
+        
+        /* Overlay oscuro para que resalte el texto frontal */
+        .card-front::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+            border-radius: 24px;
+        }
+
+        .front-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            border: 6px double rgba(255, 154, 158, 0.4);
+            border-radius: 20px;
+            margin: 12px;
+            height: calc(100% - 24px);
+            width: calc(100% - 24px);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            /* Textura de papel sutil para atrás */
+            background-color: #fdfbfb;
+            background-image: linear-gradient(0deg, transparent 24%, rgba(200, 200, 200, .1) 25%, rgba(200, 200, 200, .1) 26%, transparent 27%, transparent 74%, rgba(200, 200, 200, .1) 75%, rgba(200, 200, 200, .1) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(200, 200, 200, .1) 25%, rgba(200, 200, 200, .1) 26%, transparent 27%, transparent 74%, rgba(200, 200, 200, .1) 75%, rgba(200, 200, 200, .1) 76%, transparent 77%, transparent);
+            background-size: 30px 30px;
+            padding: 2.5rem 1.5rem;
+            border: 8px solid rgba(161, 140, 209, 0.2);
+            border-radius: 24px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        /* Clase que se activa con JS para girar la tarjeta */
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Caras frontal y trasera */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            border-radius: 20px;
+            overflow: hidden;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-front {
+            background: url('https://images.unsplash.com/photo-1527529482837-4698179dc6ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+            position: relative;
+        }
+        
+        /* Overlay oscuro para que resalte el texto frontal */
+        .card-front::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+        }
+
+        .front-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+            border: 8px solid rgba(255, 154, 158, 0.3);
+            border-radius: 20px;
+            margin: 10px;
+            height: calc(100% - 20px);
+            width: calc(100% - 20px);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: #ffffff;
+            padding: 2rem 1.5rem;
+            border: 8px solid rgba(161, 140, 209, 0.3);
+            border-radius: 20px;
+        }
+
+        /* Decoraciones y animaciones flotantes */
+        .floating-element {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .sparkle {
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .title-font {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Botón animado en el frente */
+        .tap-indicator {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Divisores decorativos */
+        .divider {
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            margin: 1.2rem auto;
+        }
+
+        /* Control de Música Flotante */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 154, 158, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+        }
+
+        .music-control i {
+            font-size: 1.2rem;
+            color: #ff6b6b;
+        }
+
+        .music-playing .music-icon {
+            animation: pulse-music 1.5s infinite;
+        }
+
+        @keyframes pulse-music {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Audio Element (Audio de fantasía de stock gratuito) -->
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/01/21/audio_31743c58bb.mp3?filename=magic-in-the-air-43177.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Botón de música flotante -->
+    <div class="music-control" id="musicBtn" onclick="toggleMusic(event)" title="Reproducir/Pausar Música">
+        <i class="fa-solid fa-music-slash" id="musicIcon"></i>
+    </div>
+
+    <div class="card-wrapper">
+        <div class="card-container" onclick="flipCard()">
+            <div class="card" id="invitationCard">
+                
+                <!-- CARA FRONTAL -->
+                <div class="card-face card-front">
+                    <div class="front-content">
+                        
+                        <!-- Emojis flotantes interactivos -->
+                        <div class="absolute top-8 left-6 text-5xl floating-element" style="animation-delay: 0s; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));">🎈</div>
+                        <div class="absolute top-12 right-6 text-4xl sparkle text-yellow-400" style="animation-delay: 1.5s;">✨</div>
+                        <div class="absolute bottom-32 left-8 text-5xl floating-element" style="animation-delay: 0.7s; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));">🎉</div>
+                        <div class="absolute bottom-40 right-8 text-3xl sparkle text-pink-400" style="animation-delay: 0.3s;">✨</div>
+
+                        <div class="bg-white/80 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm border border-pink-100 mb-6 transform -rotate-2">
+                            <p class="text-pink-600 font-bold tracking-widest uppercase text-sm">¡Estás Invitado!</p>
+                        </div>
+                        
+                        <div class="floating-element mb-2 drop-shadow-lg relative">
+                            <div class="absolute inset-0 bg-yellow-200 blur-xl rounded-full opacity-50"></div>
+                            <i class="fa-solid fa-crown text-6xl relative z-10" style="color: #ffd700;"></i>
+                        </div>
+
+                        <h1 class="title-font text-7xl text-transparent bg-clip-text bg-gradient-to-br from-pink-400 via-pink-500 to-purple-600 mb-0 leading-none drop-shadow-sm filter">
+                            Camila
+                        </h1>
+                        <p class="title-font text-5xl text-gray-300 my-0">&</p>
+                        <h1 class="title-font text-7xl text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 mt-0 leading-none drop-shadow-sm">
+                            Liam
+                        </h1>
+
+                        <div class="mt-auto pt-8 w-full">
+                            <p class="tap-indicator w-[90%] mx-auto bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white px-6 py-4 rounded-2xl font-bold shadow-lg shadow-purple-500/30 text-lg flex items-center justify-center gap-3">
+                                <i class="fa-solid fa-envelope-open-text animate-pulse"></i> Toca para abrir
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARA TRASERA -->
+                <div class="card-face card-back flex flex-col justify-between">
+                    
+                    <div class="text-center h-full flex flex-col">
+                        <h2 class="title-font text-5xl text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 drop-shadow-sm">¡Acompáñanos!</h2>
+                        
+                        <!-- Festejados -->
+                        <div class="flex justify-center gap-4 mb-4">
+                            <div class="text-center p-4 bg-white/80 backdrop-blur border border-pink-100 rounded-2xl shadow-md flex-1 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-300 to-pink-500"></div>
+                                <i class="fa-solid fa-cake-candles text-pink-400 text-3xl mb-2 drop-shadow-sm"></i>
+                                <h3 class="font-bold text-gray-800 text-xl">Camila</h3>
+                                <p class="bg-pink-100 text-pink-600 font-bold py-1 px-3 rounded-full text-sm inline-block mt-1">7 Años</p>
+                            </div>
+                            <div class="text-center p-4 bg-white/80 backdrop-blur border border-blue-100 rounded-2xl shadow-md flex-1 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-300 to-blue-500"></div>
+                                <i class="fa-solid fa-star text-blue-400 text-3xl mb-2 drop-shadow-sm"></i>
+                                <h3 class="font-bold text-gray-800 text-xl">Liam</h3>
+                                <div class="flex flex-col items-center gap-1 mt-1">
+                                    <p class="bg-blue-100 text-blue-600 font-bold py-1 px-3 rounded-full text-sm">3 Años</p>
+                                    <span class="text-[11px] font-semibold text-purple-500 uppercase tracking-wider">Presentación</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Detalles del evento contenedores -->
+                        <div class="flex-1 flex flex-col gap-3 justify-center">
+                            <!-- Ceremonia Religiosa -->
+                            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 transition hover:shadow-md">
+                                <div class="bg-purple-100 p-3 rounded-full flex-shrink-0">
+                                    <i class="fa-solid fa-church text-purple-600 text-xl"></i>
+                                </div>
+                                <div class="text-left w-full">
+                                    <h4 class="font-bold text-gray-800 flex justify-between items-center w-full">Misa <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded ml-2">5:00 PM</span></h4>
+                                    <p class="text-[12px] text-gray-600 leading-tight mt-1 break-words">
+                                        Parroquia del Sagrado Corazón de Jesús<br>
+                                        Naucalpan de Juárez, Edo. de Méx.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Recepción -->
+                            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 transition hover:shadow-md">
+                                <div class="bg-pink-100 p-3 rounded-full flex-shrink-0">
+                                    <i class="fa-solid fa-glass-cheers text-pink-600 text-xl"></i>
+                                </div>
+                                <div class="text-left w-full">
+                                    <h4 class="font-bold text-gray-800 flex justify-between items-center w-full">Fiesta <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded ml-2">6:00 PM</span></h4>
+                                    <p class="text-[12px] text-gray-600 leading-tight mt-1 break-words">
+                                        Calle Sierra del Pirul No. 11<br>
+                                        Col. Benito Juárez<br>
+                                        Naucalpan de Juárez, Edo. de Méx.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de WhatsApp -->
+                        <div class="mt-4 pb-2">
+                            <a href="https://wa.me/525500000000?text=¡Hola!%20Confirmo%20mi%20asistencia%20a%20la%20fiesta%20de%20Camila%20y%20Liam.%20🥳" 
+                               target="_blank" 
+                               onclick="event.stopPropagation();" 
+                               class="w-full relative overflow-hidden group bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transform transition hover:-translate-y-1 hover:shadow-xl flex items-center justify-center gap-3">
+                                <!-- Brillo en hover para el boton de WP -->
+                                <div class="absolute inset-0 w-full h-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                                <i class="fa-brands fa-whatsapp text-2xl relative z-10"></i>
+                                <span class="text-lg relative z-10">Confirmar Asistencia</span>
+                            </a>
+                            <style>
+                                @keyframes shimmer {
+                                    100% { transform: skewX(-12deg) translateX(200%); }
+                                }
+                            </style>
+                        </div>
+                    </div>
+
+                    <!-- Footer / Botón Volver -->
+                    <div class="text-center mt-2">
+                        <p class="text-xs text-gray-400"><i class="fa-solid fa-rotate-left"></i> Toca de nuevo para girar</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica de música
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        let isMusicPlaying = false;
+        let hasInteracted = false; // Flag para auto-reproducir música al primer toque
+
+        function toggleMusic(event) {
+            if(event) event.stopPropagation(); // Evitar que gire la tarjeta si se toca el botón de música
+            
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicIcon.classList.remove('fa-music');
+                musicIcon.classList.add('fa-music-slash');
+                musicBtn.classList.remove('music-playing');
+            } else {
+                bgMusic.play().catch(e => console.log("Audio play failed:", e));
+                musicIcon.classList.remove('fa-music-slash');
+                musicIcon.classList.add('fa-music');
+                musicBtn.classList.add('music-playing');
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        // Función para agregar/quitar la clase que rota la tarjeta
+        function flipCard() {
+            const card = document.getElementById('invitationCard');
+            const isFlippingToBack = !card.classList.contains('is-flipped');
+            
+            // Iniciar música automáticamente al primer toque si no se ha iniciado
+            if (!hasInteracted && !isMusicPlaying) {
+                toggleMusic();
+                hasInteracted = true;
+            }
+            
+            card.classList.toggle('is-flipped');
+
+            // Disparar confeti al revelar los detalles
+            if (isFlippingToBack) {
+                setTimeout(() => {
+                    const duration = 3000;
+                    const end = Date.now() + duration;
+
+                    (function frame() {
+                        confetti({
+                            particleCount: 5,
+                            angle: 60,
+                            spread: 55,
+                            origin: { x: 0 },
+                            colors: ['#ff9a9e', '#a18cd1', '#fbc2eb', '#8fd3f4', '#ffd700']
+                        });
+                        confetti({
+                            particleCount: 5,
+                            angle: 120,
+                            spread: 55,
+                            origin: { x: 1 },
+                            colors: ['#ff9a9e', '#a18cd1', '#fbc2eb', '#8fd3f4', '#ffd700']
+                        });
+
+                        if (Date.now() < end) {
+                            requestAnimationFrame(frame);
+                        }
+                    }());
+                }, 400); // Retraso para que coincida con el final del giro
+            }
+        }
+    </script>
+</body>
+</html>
